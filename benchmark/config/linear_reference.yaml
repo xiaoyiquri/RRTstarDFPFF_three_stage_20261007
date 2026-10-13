@@ -1,0 +1,42 @@
+# Original test.cpp geometry. Continuous polynomial checks replace its sparse
+# collision samples, so this is not yet a measured like-for-like comparison.
+system: linear
+environment: legacy_five_circles
+start: [2, 2, 0, 0]
+goal: [18, 18]
+bounds:
+  lower: [0, 0]
+  upper: [20, 20]
+limits:
+  max_velocity: 10
+  max_control: 8
+  obstacle_margin: 0.0
+obstacles:
+  - {center: [6, 6], radius: 3}
+  - {center: [15, 14], radius: 3}
+  - {center: [10, 11], radius: 2}
+  - {center: [5, 15], radius: 3.5}
+  - {center: [15, 5], radius: 3}
+planner:
+  timeout: 10.0
+  goal_bias: 0.0
+  range: 4.0
+  rewire_factor: 3.0
+  goal_tolerance: 0.5
+  max_iterations: 1000000
+  max_nodes: 4001
+  prune: false
+  stop_at_first_solution: false
+pff:
+  R_diagonal: [1, 1]
+  free_terminal_state: true
+  free_terminal_time: true
+  min_time: 0.001
+  max_time: 5.0
+  fixed_time: 1.0
+simd:
+  enabled: false
+benchmark:
+  runs: 1
+  seed: 40
+  output_directory: ../../results/linear_reference

@@ -1,0 +1,7 @@
+{
+  "scope": "Python derivation audit only; C++ compilation and tests NOT executed",
+  "cases": 27,
+  "max_relative_energy_error": 3.2128950224615645e-13,
+  "max_endpoint_error": 2.4650586358313887e-10,
+  "passed": true
+}

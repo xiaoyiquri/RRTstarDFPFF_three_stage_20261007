@@ -1,0 +1,10 @@
+========== Compile modified benchmark ==========
+Consolidate compiler generated dependencies of target rrtstar_df_pff
+[ 60%] Built target rrtstar_df_pff
+[ 73%] Built target rrtpff_paper_data
+Consolidate compiler generated dependencies of target benchmark
+[ 80%] Building CXX object CMakeFiles/benchmark.dir/benchmark/production_runner.cpp.o
+[ 86%] Linking CXX executable benchmark
+[100%] Built target benchmark
+PFF duration: old runner; checking the six anytime YAML presets
+ERROR: /home/cxt/MYFILE/newfile/RRTstar/RRTstarDFPFF_paper_r2_float32_strict_20261007/benchmark/config/anytime/quad2d_bugtrap.yaml does not specify additional_time_samples: 12

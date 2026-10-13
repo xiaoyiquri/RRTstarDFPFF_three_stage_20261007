@@ -1,0 +1,357 @@
+[
+  {
+    "path": "CMakeLists.txt",
+    "change": "modified",
+    "sha256": "78a1669446c9a8b2b23fbffb0014a4a58095d4002a699222d8854fbfb6ac567d"
+  },
+  {
+    "path": "README.md",
+    "change": "modified",
+    "sha256": "c748686dd6190b90ef07dc68840ccaa05147978631b2c79dd0eb329a6920ed08"
+  },
+  {
+    "path": "summary.md",
+    "change": "modified",
+    "sha256": "3a4e0567a429f07eea78a1439a77a638e5a5c18bde56d43711196eed8ae73de6"
+  },
+  {
+    "path": "交付说明.md",
+    "change": "modified",
+    "sha256": "adf67702a9277aaaef6c9dce81608c1d1da5c5533de57cd04a04a72c6ffe11b6"
+  },
+  {
+    "path": "修改说明.md",
+    "change": "modified",
+    "sha256": "1a9437cc9f223730c00b36daf7f37f3db05ba0216bf6a5138e6817c59662bd16"
+  },
+  {
+    "path": "benchmark/benchmark_result.h",
+    "change": "modified",
+    "sha256": "7a8fb0dbd03adcf1990be92d34c25a9713c18070757c4cd04d393be73b40f403"
+  },
+  {
+    "path": "benchmark/benchmark_runner.h",
+    "change": "modified",
+    "sha256": "d9d6b8676bc96c6b534325a6c43ca56959ffb582dc985a0ad8f7eea43fcebe6a"
+  },
+  {
+    "path": "benchmark/robot_runner.cpp",
+    "change": "modified",
+    "sha256": "b8bd6c54fe7aac443e0afad48a3e6685a04b0c4cc22011a0bb893ae1e16e1371"
+  },
+  {
+    "path": "common/planner_config.h",
+    "change": "modified",
+    "sha256": "d5e3c131baca16b08546378026d0e2b6b3b896caa75a12217beadf028c1d96af"
+  },
+  {
+    "path": "common/types.h",
+    "change": "modified",
+    "sha256": "31aeeda6567f511ef69d993eaf4183132885e27492d5aef6269ff1f4712c15bf"
+  },
+  {
+    "path": "core/rrtstar.h",
+    "change": "modified",
+    "sha256": "17a1b0100235eee28246dd69e78d5f4cdbe9fbc1fbc9c96811821534eb1c36b0"
+  },
+  {
+    "path": "df/simd_inverse.h",
+    "change": "added",
+    "sha256": "ba9795c46657e094faa077e575f45f12af16d09830c490d512f719a9eed8d9c7"
+  },
+  {
+    "path": "docs/paper_simd_20260922.md",
+    "change": "added",
+    "sha256": "c200a6e5326f178d4ebac449296f8873605529ace40901974b2c90235c1926d5"
+  },
+  {
+    "path": "docs/source_integrity.json",
+    "change": "added",
+    "sha256": "38d7e59ff90c8ffa18d19cf07615e0cde3e9894c9f4aa797f4e8ef8a7b00fee3"
+  },
+  {
+    "path": "dynobench/data_adapter.cpp",
+    "change": "added",
+    "sha256": "c0ca8b22580376b8ced20ddadca6980f0213f508c27e61e0caa8c3b813fa28e3"
+  },
+  {
+    "path": "dynobench/data_adapter.h",
+    "change": "added",
+    "sha256": "87308bbfeb51e1f7d19d92681a92178bf6367854e79028ea5ec2ead12c5c7cd7"
+  },
+  {
+    "path": "simd/discrete_validator.h",
+    "change": "added",
+    "sha256": "1e2a78401ba31c3679bf7cf42fdb4f13f6724544c5153e27d582fd0eb6cedbe9"
+  },
+  {
+    "path": "simd/float8.h",
+    "change": "added",
+    "sha256": "2ff1ea98fb4f4b50a0dfb6e704edaea68f73f8d2b6cb068332ce8108550e75be"
+  },
+  {
+    "path": "simd/physical_avx2.cpp",
+    "change": "added",
+    "sha256": "0e0cb9a530413cdb7f38203d9664eb39c40e8d87b0a1d4b5af61a213025edf9b"
+  },
+  {
+    "path": "simd/physical_batch.cpp",
+    "change": "added",
+    "sha256": "9b53fa02769116ee2985b4459d416911074a91c1da321d94ac55dbadbf15c1c3"
+  },
+  {
+    "path": "simd/physical_batch.h",
+    "change": "added",
+    "sha256": "290d391984fcb31d2f22901034ef2aebb8111f6670ce6c4c9d6db56242743881"
+  },
+  {
+    "path": "systems/batch_config.h",
+    "change": "added",
+    "sha256": "3a5f68680e7f758aa962f27de5e813bc95ccac2e85c629720cf8477c460dd12f"
+  },
+  {
+    "path": "systems/dyno_model.h",
+    "change": "modified",
+    "sha256": "1056f90cfa44714ad10520da006fdfc86c6c504b08fab49467c0f971af8d4306"
+  },
+  {
+    "path": "systems/robot_factory.h",
+    "change": "modified",
+    "sha256": "fd072cc7371650d92fca0eb7a57c1061913f84c09a6ea0f137daa53e8a8298e4"
+  },
+  {
+    "path": "tests/test_paper_fast.cpp",
+    "change": "modified",
+    "sha256": "2f3982774f55f4bd67fbc19180c88596ec5ac26879ea0d4652122e9d37b8f6a8"
+  },
+  {
+    "path": "tests/test_paper_profile.cpp",
+    "change": "modified",
+    "sha256": "9ca126972aad4540617a6c7077814a32dd6504a40128c757d5889b6cda907107"
+  },
+  {
+    "path": "tests/test_physical_simd.cpp",
+    "change": "added",
+    "sha256": "de0c3abecbe07ca4d6fc5fe2d6b6bcff95cf0f35e576c985d9ad9a23d1c2c022"
+  },
+  {
+    "path": "tests/test_sphere_geometry.cpp",
+    "change": "added",
+    "sha256": "f95ba9b722840597100d144b4ba069a1fd0814411bcede21e32c3a63775f7775"
+  },
+  {
+    "path": "tools/run_six.py",
+    "change": "modified",
+    "sha256": "2ec87a7c976d88886147156f3ed9295def8811f39fb0a58602e1b8a866e7e160"
+  },
+  {
+    "path": "reference/legacy_validation/inspect_results.py",
+    "change": "added",
+    "sha256": "2de55513f57124c7428330d8ac57f6afb3a3145867d379967da61bcd4f8809e9"
+  },
+  {
+    "path": "reference/legacy_validation/README.md",
+    "change": "added",
+    "sha256": "ee0ef661492d346fb92d5b27949317fcfe504b01926c24e298fd4e9b1d2b08ba"
+  },
+  {
+    "path": "reference/legacy_validation/real_adapter.cpp",
+    "change": "added",
+    "sha256": "6810482809eae345b47377b6f780ed05da950bce47e822a83c83ab05e9265692"
+  },
+  {
+    "path": "reference/legacy_validation/real_adapter.h",
+    "change": "added",
+    "sha256": "dd4db2f70e66fb27958ef6800617c5ce431b90aa9aa282f04bc1425e2487bc89"
+  },
+  {
+    "path": "reference/legacy_validation/test_planar_search.cpp",
+    "change": "added",
+    "sha256": "604966cfffc95e525c81ab891f71033e58e4cdf37ece662ce568b6b678c9a62f"
+  },
+  {
+    "path": "reference/legacy_validation/test_quad3d_baseline.cpp",
+    "change": "added",
+    "sha256": "2bf35d98154a282eb05457b85504b42170c4f675f53fa31f37116a03a67cb0aa"
+  },
+  {
+    "path": "reference/legacy_validation/test_real_dynobench.cpp",
+    "change": "added",
+    "sha256": "c4a364d9881264e07bc7534be2b1db9b0abbfccb442f5d5ce77292ec874b23ad"
+  },
+  {
+    "path": "reference/legacy_validation/verify_quad3d_baseline.py",
+    "change": "added",
+    "sha256": "53968eef8007b093b931d6aa9808a3330f038148c500fd6eb267819d26aef8ad"
+  },
+  {
+    "path": "docs/history/dynobench_offline_blockers_20260920.md",
+    "change": "added",
+    "sha256": "88a26cf1f97db1299cb4d643a1a796ac8a481ef6cb35d7d3d55c28004e9ad10e"
+  },
+  {
+    "path": "docs/history/format_report.md",
+    "change": "added",
+    "sha256": "8ef4d4f80570d54c21358588b4076871b172f450c033a62590c00297d2a5dbba"
+  },
+  {
+    "path": "docs/history/function_migration.tsv",
+    "change": "added",
+    "sha256": "301f027569d208bafdb0c0462b23e69a68d85ea407011800092e937aadd44c37"
+  },
+  {
+    "path": "docs/history/math_check.json",
+    "change": "added",
+    "sha256": "cb6e5a9a36b8327edc0b6de58cc75e63c22f243439e63f959529408df0d5210f"
+  },
+  {
+    "path": "docs/history/paper_fast_20260921.md",
+    "change": "added",
+    "sha256": "6273eb8015f24a20a69474f01808171dc846181991352532721ddfd7b56a5f12"
+  },
+  {
+    "path": "docs/history/paper_fast_plan.md",
+    "change": "added",
+    "sha256": "d16e8c80af7ac0c71c1421e816bdf1da7a71ab099a699c9df44ea1c6949d6157"
+  },
+  {
+    "path": "docs/history/PLAN-REVIEW-LOG.md",
+    "change": "added",
+    "sha256": "22fb49457e0b6f44535c1e35e41f31cea37ef2132698906d0589b9ef33bd4719"
+  },
+  {
+    "path": "docs/history/PLAN.md",
+    "change": "added",
+    "sha256": "66859ba1d8c0457a3c5de334501d80a68552df07fef4cf4beac9cdf50f737ef2"
+  },
+  {
+    "path": "docs/history/planar_fixes_20260920.md",
+    "change": "added",
+    "sha256": "ee831055915af6716c3f06573efa79eb4254b5a4d2a10ecac4aa7fb2fd884403"
+  },
+  {
+    "path": "docs/history/quad3d_baseline_portability_fix.md",
+    "change": "added",
+    "sha256": "acedf30719337b6ba64ed8a8d6bcf48d80c809f70a394d2e650df5615c5cd888"
+  },
+  {
+    "path": "docs/history/README_before_paper_fast.md",
+    "change": "added",
+    "sha256": "686799f59c377852fb8ec506e0ee6b584a1619969af63bd595a6cd364db715f3"
+  },
+  {
+    "path": "docs/history/real_dynobench_20260920.md",
+    "change": "added",
+    "sha256": "1061ce2063f4e708957ddca63d2cd04f95f8d8a86ebc0ca058e3423c2407e644"
+  },
+  {
+    "path": "docs/history/reference_sha256.json",
+    "change": "added",
+    "sha256": "b6f29c712b5cd2d767aeb5efd066779f3b29c10af4fb146c0daf129e1ff05555"
+  },
+  {
+    "path": "docs/history/requirements_checklist.md",
+    "change": "added",
+    "sha256": "0e9db934cbeb96243c0db02f67ec9e2b90cde0f3c7ac53dfa78343432c34420a"
+  },
+  {
+    "path": "docs/history/rewire_fixed_state.md",
+    "change": "added",
+    "sha256": "d317d0c2dea92f3fc4a8b8091743b5f2eeadcfedc5c0ced8048f8243fa0379a7"
+  },
+  {
+    "path": "docs/history/rewire_fixed_state.patch",
+    "change": "added",
+    "sha256": "ec19b67b63bb1a42e1b1693029b46bb03b7d1f91e5cd3649da33d9c74f5ac373"
+  },
+  {
+    "path": "docs/history/search_fixes_20260920.md",
+    "change": "added",
+    "sha256": "66d97cf5ee657643915f03350f52b7f1248434b80b7947f413e2c311532003ae"
+  },
+  {
+    "path": "docs/history/simd_change_manifest.json",
+    "change": "added",
+    "sha256": "4732f099ba056431d98925ee47b11f802090df4d0bdf3eaf60d548c0906f7521"
+  },
+  {
+    "path": "docs/history/simd_implementation_20260920.md",
+    "change": "added",
+    "sha256": "392550e6d376f00f6177d6e6a8fdb058f22ae77aa3bb13f98281096f4337cacb"
+  },
+  {
+    "path": "docs/history/simd_reference_verification.json",
+    "change": "added",
+    "sha256": "df1f11d6b7e869af56c9c10390407cb5591bc863ed5fc9ce241236ee86edb8a1"
+  },
+  {
+    "path": "docs/history/summary.md",
+    "change": "added",
+    "sha256": "d9fddc2b3a34860557db336e3148cd17dd577033dade1178e40b2d813fdf4e6e"
+  },
+  {
+    "path": "docs/history/交付说明.md",
+    "change": "added",
+    "sha256": "b874e8324e7c9bb2172a01eae997c34e1382e57732fb9bcb3cf4ec142ec40a75"
+  },
+  {
+    "path": "docs/history/修改说明.md",
+    "change": "added",
+    "sha256": "34d8d8ff870c01c80927409f8419821730c3af9d535fcf329e35f75dfe3d2815"
+  },
+  {
+    "path": "benchmark/config/linear_reference.yaml",
+    "change": "modified",
+    "sha256": "ebf326cc0763d4e33192883eaa674e5ebfa9a725582b66880725945a8968d00b"
+  },
+  {
+    "path": "benchmark/config/linear_simd_fast.yaml",
+    "change": "modified",
+    "sha256": "126575ac26a3360d91d647f7c0bf4dbaa223c25cade8e92f52393516dd745576"
+  },
+  {
+    "path": "benchmark/config/linear_simd_reference.yaml",
+    "change": "modified",
+    "sha256": "c7561f902c0928e6795a72c5b00f554f5fbd39f6ac4637a921d9874377b9c8be"
+  },
+  {
+    "path": "benchmark/config/linear_simd_smoke.yaml",
+    "change": "modified",
+    "sha256": "e995699870441c2251ecf8a886aecdd1a92de5154e91ba11c4f8425627b9666a"
+  },
+  {
+    "path": "benchmark/config/linear_smoke.yaml",
+    "change": "modified",
+    "sha256": "5027ee40697af7ece96791399c2dfa406b315294b36ef3a17c5428deec47a47d"
+  },
+  {
+    "path": "benchmark/config/quad2d_bugtrap.yaml",
+    "change": "modified",
+    "sha256": "69e245c539b5eaaff9c5bdb482ff9b96922728472efdb58df862688e7ea98464"
+  },
+  {
+    "path": "benchmark/config/quad2d_hole.yaml",
+    "change": "modified",
+    "sha256": "6882005729cc4c47d9bd40ce6400ef2770c2b62422cbc964cddc32eee6c6ad49"
+  },
+  {
+    "path": "benchmark/config/quad3d_block.yaml",
+    "change": "modified",
+    "sha256": "3ff1fd290eb2665619971bcf3cd6416d9c9594f4334d5ba868f5fd394c54bbe2"
+  },
+  {
+    "path": "benchmark/config/quad3d_window.yaml",
+    "change": "modified",
+    "sha256": "65a97962ab601328687bbda8ce51f971a43fda80e76e5f7cd1fd28ed9185c297"
+  },
+  {
+    "path": "benchmark/config/uni_bugtrap.yaml",
+    "change": "modified",
+    "sha256": "1489602c67f2bdec95dff2e48d96c3b991de9ad10a91df01d33e806a353a6ad4"
+  },
+  {
+    "path": "benchmark/config/uni_wall.yaml",
+    "change": "modified",
+    "sha256": "b6dbdcdf6f699b1a94d4640a9aba3d718deee8983e07201da26ac7826ddca105"
+  }
+]

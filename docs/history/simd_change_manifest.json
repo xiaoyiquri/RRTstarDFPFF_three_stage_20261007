@@ -1,0 +1,215 @@
+{
+  "snapshot_note": "simd_backend.h snapshot is an early intermediate draft; see implementation report.",
+  "changes": [
+    {
+      "file": "common/planner_config.h",
+      "status": "modified",
+      "snapshot_sha256": "354132e3f644940edb722f826baa032427a6e324471ca40a264ee9842004459a",
+      "current_sha256": "68ed31ba50da64b2add013e0e9a5cbc879362b6ef2f99ec9aeb100c7187a7177"
+    },
+    {
+      "file": "common/types.h",
+      "status": "modified",
+      "snapshot_sha256": "2b8e86785944270f1ba0bbed0154b4ddd3e775e8626b627351452aedc1d82fc8",
+      "current_sha256": "2f7edb4366a46d2e5e43d6ecf979c7ce929a5800ccec942d381b74645d99f04d"
+    },
+    {
+      "file": "core/nearest_neighbor.h",
+      "status": "modified",
+      "snapshot_sha256": "3ba5eb392a0376204f2c5fd587dddd77b2baef721307cdf9c0e6a3f13cdbfea6",
+      "current_sha256": "960bda3c88e8064d2778660a8d590b4a1a634b2c8fec8de5e1913549dd5261d8"
+    },
+    {
+      "file": "core/node.h",
+      "status": "modified",
+      "snapshot_sha256": "9e673d0508dcc2f1234d42781dfbfdc153bb3f3dc2d8044fadb00403da477e99",
+      "current_sha256": "251a824bd3a0363feabd3989d212827b4330de81e5d4ca791c4d23040bb2adae"
+    },
+    {
+      "file": "core/rrtstar.h",
+      "status": "modified",
+      "snapshot_sha256": "6ac3003efb9646283cbfa2ea56d0007b511bc587da37122c8346846569bca275",
+      "current_sha256": "2aa5168bd3a8938ab3b46881df3751a3e2286c7c2923523adf562a65f70989cb"
+    },
+    {
+      "file": "core/tree.h",
+      "status": "modified",
+      "snapshot_sha256": "589261bd55451bf5f7753b3c57913f61fff5d016b54abe61a028fd11797b947d",
+      "current_sha256": "a2b609949f5a1fa762864f6409d178c39226b328bf383ae21c9230b7b04da474"
+    },
+    {
+      "file": "pff/pff.h",
+      "status": "modified",
+      "snapshot_sha256": "24e137edc17ffdf1810707efd59f74a73e9e8ea2c156e182b5c20c47e605998d",
+      "current_sha256": "f751489398c8f475f7293be25c7f879b5e916d7930b910b0bce15f949a1b292a"
+    },
+    {
+      "file": "pff/pff_cost.h",
+      "status": "modified",
+      "snapshot_sha256": "7a120ea42c4e38764106789809ef232617afaa0a33aa236a2f384e37d4647898",
+      "current_sha256": "7fdb5396bdf0736b55079b8aed473febe9e179cb4365e511f4cecd50b5dde2e3"
+    },
+    {
+      "file": "pff/pff_integrator.h",
+      "status": "modified",
+      "snapshot_sha256": "362b7b707db9d4b4b246bfb8fee0197090c329aac941adf00778171a1984314b",
+      "current_sha256": "1a505cd5b2eedbc25aec18056ad0a0b6f73de61cf0fb42a3030ca8d5b9983de5"
+    },
+    {
+      "file": "df/quad3d_df.h",
+      "status": "modified",
+      "snapshot_sha256": "9470288c528000452fae1b1e277a0d646b2c555acf6ac4d095f17c166e032700",
+      "current_sha256": "12d4f2e2ff4047385bfb3f04f1e54139cc6b183d9c3e2c921cc8c537465ab6b8"
+    },
+    {
+      "file": "systems/linear_model.h",
+      "status": "modified",
+      "snapshot_sha256": "17d4b94f24942c9f5047d41f5063a61103fde74de93a38a5c3553c9cf48ab642",
+      "current_sha256": "4e14458e33b347250fbad269ed8b9bd5a3f60dabd7a086ad7b3ea9235551cca9"
+    },
+    {
+      "file": "simd/simd_avx2.cpp",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "c43dc5ebd1eef93c5980ff72d4ad623cb1c6fb76a2ce5ba31e895049cac19e74"
+    },
+    {
+      "file": "simd/simd_backend.cpp",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "0255bb0a42322b8fed0f27a374fa653e4bb8e15371dad4dc4b3e078d1338fc64"
+    },
+    {
+      "file": "simd/simd_backend.h",
+      "status": "modified",
+      "snapshot_sha256": "e3fbe57052fe8ab6a7fc69f81c5502155f2130f533556bdf5ee19e089c9f03b2",
+      "current_sha256": "dec15e9a41b802eb55cc52bb7bfaf92df4858b662bb79b0aef1f410149316b7f"
+    },
+    {
+      "file": "simd/simd_collision.h",
+      "status": "modified",
+      "snapshot_sha256": "8174453e1cb8adcbd0aa34aaea9612cede158a39aca7d5499f472d0d8eb9b82c",
+      "current_sha256": "98d12a5a7f9b9e966b99d172373d6a0b862a7b27cec24a5f374a32960e206a0b"
+    },
+    {
+      "file": "simd/simd_flat_eval.h",
+      "status": "modified",
+      "snapshot_sha256": "4847106536199bf5243eeef87276cfa9e1dca68606b63498f85c5628bd60463e",
+      "current_sha256": "481c1e9567a8b4cc0165b05817b3fcd42444bc08c9abcf5fd0c4b759390286bf"
+    },
+    {
+      "file": "simd/simd_pff.h",
+      "status": "modified",
+      "snapshot_sha256": "42890cc2de8cd50f3c8cd713abcccad84295d3d36546275ce721bbdd7a77f683",
+      "current_sha256": "24bd03ce79e7fbe5118f2189afe2bb872bc2b9d50c5d5fedd0c5ee360ffa73c2"
+    },
+    {
+      "file": "simd/simd_roots.h",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "2ff5f7af01a3cb4d4d3a5b4d3b87df82ef8f9ca0b5bb0290e0a634bcda9e5286"
+    },
+    {
+      "file": "benchmark/benchmark_result.h",
+      "status": "modified",
+      "snapshot_sha256": "36b70e2bc827f331dff66ee0831313cdd37d6a6521ba568ba9a85c8d8b370985",
+      "current_sha256": "1368023e4d2febdbd62ac717c4fccab378aa4c44f37b5a4413279abd611334b3"
+    },
+    {
+      "file": "benchmark/benchmark_runner.h",
+      "status": "modified",
+      "snapshot_sha256": "ad7b49f28f4fcb658224a66b602a799ba348d8d8d7172611c1fd890dc4b49ba2",
+      "current_sha256": "1cfbc47bf17049d9f7f990b2d51e4e21bea08c5f9b5e891b9f2f0ea01b7b4edf"
+    },
+    {
+      "file": "benchmark/compare_backends.py",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "16eb89659edff92183628e718fbd85a4be876ebd859460b1b98334207a6c193d"
+    },
+    {
+      "file": "benchmark/config/linear_simd_fast.yaml",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "4ad1d3444276d4960bafd3c0c9ede50f956824f3561b4634eb7c038d54dbd92d"
+    },
+    {
+      "file": "benchmark/config/linear_simd_reference.yaml",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "673093c741aa98fd55c32be6f62635d3fbef48bc5262a64ea76a1d9fe16218ca"
+    },
+    {
+      "file": "benchmark/config/linear_simd_smoke.yaml",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "e6e594e2e7367f9fd7d1a8194651284495238ba048fa09f0749fbabd4c25617b"
+    },
+    {
+      "file": "tests/test_end_to_end.cpp",
+      "status": "modified",
+      "snapshot_sha256": "67c2b15f63afbe3f561c6d5a3587ca1914e7ea4614de83fe40a7e22a6988d59a",
+      "current_sha256": "9b293e49459d0908e5fdb7ca2fdf1477ef3bad021fbe46e115f90789b36bfdf0"
+    },
+    {
+      "file": "tests/test_simd.cpp",
+      "status": "modified",
+      "snapshot_sha256": "d70bc363b2f589794a9c3164e088088118f0a70b03752d488c330aaa57b3f064",
+      "current_sha256": "faeab6be865d700b4bb62d4c0b917a927373c165af46a0eeb3794886592f3d6b"
+    },
+    {
+      "file": "docs/function_migration.tsv",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "301f027569d208bafdb0c0462b23e69a68d85ea407011800092e937aadd44c37"
+    },
+    {
+      "file": "docs/math_check.json",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "cb6e5a9a36b8327edc0b6de58cc75e63c22f243439e63f959529408df0d5210f"
+    },
+    {
+      "file": "docs/reference_sha256.json",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "b6f29c712b5cd2d767aeb5efd066779f3b29c10af4fb146c0daf129e1ff05555"
+    },
+    {
+      "file": "docs/requirements_checklist.md",
+      "status": "modified",
+      "snapshot_sha256": "10c27b0910e47318fc3a968c2c0fa0a04a1be140b394ce024ffabd9f01455742",
+      "current_sha256": "0e9db934cbeb96243c0db02f67ec9e2b90cde0f3c7ac53dfa78343432c34420a"
+    },
+    {
+      "file": "docs/rewire_fixed_state.patch",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "ec19b67b63bb1a42e1b1693029b46bb03b7d1f91e5cd3649da33d9c74f5ac373"
+    },
+    {
+      "file": "docs/simd_implementation_20260920.md",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "392550e6d376f00f6177d6e6a8fdb058f22ae77aa3bb13f98281096f4337cacb"
+    },
+    {
+      "file": "docs/simd_reference_verification.json",
+      "status": "added",
+      "snapshot_sha256": null,
+      "current_sha256": "df1f11d6b7e869af56c9c10390407cb5591bc863ed5fc9ce241236ee86edb8a1"
+    },
+    {
+      "file": "CMakeLists.txt",
+      "status": "modified",
+      "snapshot_sha256": "2fd049a517a2b97d58902c7c906a57035930305773c1ba5e0d82e5c0d442b7f9",
+      "current_sha256": "18047850873d9cb43701f02d1aa2622f321af3a56b367427ba044755325e2649"
+    },
+    {
+      "file": "README.md",
+      "status": "modified",
+      "snapshot_sha256": "9bf017aeed7a25a9ae6e58f64970bf1df1cb5bad0680e5d14d22ed2704e8f24e",
+      "current_sha256": "72fb82d94cdb8e94b13040372cf2704574df83ae05829a9b21811f9210245995"
+    }
+  ]
+}

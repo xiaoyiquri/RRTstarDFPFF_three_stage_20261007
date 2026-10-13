@@ -1,0 +1,488 @@
+diff --git a/core/rewiring.h b/core/rewiring.h
+--- a/core/rewiring.h
++++ b/core/rewiring.h
+@@ -2,11 +2,14 @@
+ #include <algorithm>
+ #include <cmath>
+ #include <stdexcept>
++#include <type_traits>
++#include <variant>
+ #include <vector>
+ 
+ namespace rrtpff {
+ // Local solving and validation happen before commit. This class only changes
+-// tree ownership links and cumulative costs; it never changes a node's state.
++// one incoming edge, tree ownership links and cumulative costs. Existing node
++// states/metadata and all descendant edges remain unchanged.
+ template <class Node>
+ class Rewiring {
+ public:
+@@ -34,6 +37,15 @@
+ 
+     static bool commit(Node* node, Node* parent,
+                        const typename Node::Trajectory& edge) {
++        static_assert(std::is_same_v<typename Node::MetadataType, std::monostate>,
++                      "Stateful metadata requires a model for rewire validation");
++        return commit(node, parent, edge, std::monostate{});
++    }
++
++    template <class Model>
++    static bool commit(Node* node, Node* parent,
++                       const typename Node::Trajectory& edge,
++                       const Model& model) {
+         if (!node || !parent || !node->parent || isAncestor(node, parent)) return false;
+         if (!std::isfinite(edge.cost) || edge.cost <= 0) return false;
+         if (!edge.start.values.isApprox(parent->state.values, 1e-7) ||
+@@ -41,11 +53,17 @@
+             return false;
+         if (parent->cost + edge.cost >= node->cost - 1e-10) return false;
+ 
++        // Matching flat coordinates alone need not identify the same physical
++        // state. Ask the model to match the endpoint semantics before mutation.
++        if constexpr (!std::is_same_v<typename Node::MetadataType, std::monostate>) {
++            if (!model.terminalMetadataMatches(edge, node->metadata)) return false;
++        }
++
+         node->parent->removeChild(node);
+         node->parent = parent;
+         parent->addChild(node);
+         node->incoming = edge;
+-        node->metadata = edge.metadata;
++        // The target state and its metadata are immutable under rewiring.
+         node->cost = parent->cost + edge.cost;
+         propagateCostToChildren(node);
+         return true;
+diff --git a/core/rrtstar.h b/core/rrtstar.h
+--- a/core/rrtstar.h
++++ b/core/rrtstar.h
+@@ -171,6 +171,8 @@
+                 continue;
+ 
+             std::vector<Candidate> candidates;
++            // Reconnect to the existing complete state. Only this incoming
++            // edge is solved; no state or internal subtree edge is regenerated.
+             appendCandidates(added, Constraint::full(node->state), candidates);
+             sortCandidates(candidates);
+ 
+@@ -178,9 +180,8 @@
+                 const auto& candidate = candidates[i];
+                 if (candidate.total >= node->cost - 1e-10) break;
+                 if (model_.trajectoryValid(candidate.edge.trajectory, stats_) &&
+-                    Rewiring<Node>::commit(node, added, candidate.edge.trajectory)) {
+-                    node->metadata =
+-                        model_.terminalMetadata(candidate.edge.trajectory);
++                    Rewiring<Node>::commit(node, added, candidate.edge.trajectory,
++                                           model_)) {
+                     ++stats_.rewire_count;
+                     break;
+                 }
+diff --git a/systems/unicycle_model.h b/systems/unicycle_model.h
+--- a/systems/unicycle_model.h
++++ b/systems/unicycle_model.h
+@@ -86,6 +86,25 @@
+             }
+             return metadata;
+         }
++
++        bool terminalMetadataMatches(const FlatTrajectory& edge,
++                                     const Metadata& target_metadata) const {
++            if (!UnicycleDF::validMetadata(target_metadata, df_config_)) {
++                return false;
++            }
++            const Metadata terminal = terminalMetadata(edge);
++            if (!UnicycleDF::validMetadata(terminal, df_config_) ||
++                terminal.branch != target_metadata.branch) {
++                return false;
++            }
++            // Edge metadata records its START speed. A fixed-endpoint rewire
++            // must compare the reconstructed END speed with the frozen node.
++            return std::abs(terminal.signed_start_velocity -
++                            target_metadata.signed_start_velocity) <=
++                df_config_.start_tolerance *
++                    (1.0 + std::abs(target_metadata.signed_start_velocity));
++        }
++
+         const FlatOutput& goalOutput()const {
+             return goal_;
+         }
+diff --git a/tests/test_tree.cpp b/tests/test_tree.cpp
+--- a/tests/test_tree.cpp
++++ b/tests/test_tree.cpp
+@@ -3,30 +3,123 @@
+ #include "core/rewiring.h"
+ #include "pff/pff.h"
+ #include "tests/test_support.h"
++#include <algorithm>
++#include <array>
++#include <vector>
++
+ using namespace rrtpff;
+-int main() {return runTest([] {
+-    using Node=RRTNode<2,2>;
+-    RRTTree<Node> tree;PFFSolver<2,2> solver;
+-    Node::State root_state,a_state,b_state,c_state,d_state;
+-    a_state.values(0)=2;b_state.values(0)=1;c_state.values(0)=3;d_state.values(0)=4;
+-    auto edge=[&](const Node::State& from,const Node::State& to,double T) {
+-        auto r=solver.fixedTime(from,TerminalConstraint<2,2>::full(to),T);
+-        require(r.success,"Test edge solve");
+-        return r.trajectory;
++
++template <int Dim, int Order>
++void checkFixedStateRewire() {
++    using Node = RRTNode<Dim, Order>;
++    using State = typename Node::State;
++    using Output = typename State::Output;
++    RRTTree<Node> tree;
++    PFFSolver<Dim, Order> solver;
++
++    State root_state;
++    for (int derivative = 1; derivative < Order; ++derivative) {
++        root_state.setDerivative(derivative, Output::Constant(0.05));
++    }
++    auto a_state = root_state;
++    auto b_state = root_state;
++    auto c_state = root_state;
++    auto d_state = root_state;
++    auto e_state = root_state;
++    a_state.values(0) = 2.0;
++    b_state.values(0) = 1.0;
++    c_state.values(0) = 3.0;
++    d_state.values(0) = 4.0;
++    e_state.values(0) = 3.0;
++    e_state.values(1) = 0.5;
++
++    auto edge = [&](const State& from, const State& to, double time) {
++        auto result = solver.fixedTime(
++            from, TerminalConstraint<Dim, Order>::full(to), time);
++        require(result.success, "Fixed full-state test edge solved");
++        return result.trajectory;
+     };
+-    auto* root=tree.createNode(root_state);
+-    auto* a=tree.createNode(a_state,root,edge(root_state,a_state,.5));
+-    auto* b=tree.createNode(b_state,root,edge(root_state,b_state,1));
+-    auto* c=tree.createNode(c_state,a,edge(a_state,c_state,1));
+-    auto* d=tree.createNode(d_state,c,edge(c_state,d_state,1));
+-    const double previous=d->cost;
+-    require(Rewiring<Node>::commit(a,b,edge(b_state,a_state,.2)),"Valid cost-improving rewire");
+-    require(a->parent==b&&d->cost<previous,"Parent and descendant update");
+-    close(d->cost,b->cost+a->incoming.cost+c->incoming.cost+d->incoming.cost,1e-12,"Subtree cumulative cost");
+-    require((a->state.values-a_state.values).norm()==0,"Rewire preserves endpoint state");
+-    require(!Rewiring<Node>::commit(a,d,edge(d_state,a_state,1)),"Cycle rejected");
+-    require(!tree.removeNode(b),"Cannot delete internal node");
+-    require(tree.removeNode(d)&&c->children.empty(),"Leaf deletion updates parent");
+-    require(tree.size()==4,"Tree size");
+-});
++    auto* root = tree.createNode(root_state);
++    auto* a = tree.createNode(a_state, root, edge(root_state, a_state, 0.5));
++    auto* b = tree.createNode(b_state, root, edge(root_state, b_state, 1.0));
++    auto* c = tree.createNode(c_state, a, edge(a_state, c_state, 1.0));
++    auto* d = tree.createNode(d_state, c, edge(c_state, d_state, 1.0));
++    auto* e = tree.createNode(e_state, a, edge(a_state, e_state, 1.2));
++
++    const std::array<Node*, 6> nodes{root, a, b, c, d, e};
++    const std::array<Node, 6> before{*root, *a, *b, *c, *d, *e};
++    const auto replacement = edge(b_state, a_state, 1.5);
++    require(b->cost + replacement.cost < a->cost,
++            "Fixture provides an actual cost improvement");
++
++    // Every endpoint derivative is fixed, including acceleration/jerk for
++    // fourth-order systems. None may be changed to obtain a cheaper edge.
++    for (int derivative = 1; derivative < Order; ++derivative) {
++        auto invalid = replacement;
++        invalid.end.values(derivative * Dim) += 0.1;
++        require(!Rewiring<Node>::commit(a, b, invalid),
++                "Changed terminal derivative rejected");
++        require(a->parent == root && a->cost == before[1].cost &&
++                    d->cost == before[4].cost,
++                "Rejected endpoint leaves links and costs untouched");
++    }
++
++    require(Rewiring<Node>::commit(a, b, replacement),
++            "Valid cost-improving rewire");
++    const double delta = a->cost - before[1].cost;
++    require(delta < 0.0, "Cumulative cost decreases");
++    require(a->parent == b && b->children == std::vector<Node*>{a},
++            "Only rewired node gets the new parent");
++    require(root->children == std::vector<Node*>{b},
++            "Old parent removes only the rewired child");
++    require(a->children == before[1].children,
++            "Rewired node keeps its children");
++    require((a->incoming.coefficients.array() == replacement.coefficients.array()).all() &&
++                a->incoming.T == replacement.T &&
++                a->incoming.cost == replacement.cost,
++            "Only the requested incoming trajectory is replaced");
++
++    for (std::size_t i = 0; i < nodes.size(); ++i) {
++        const Node& current = *nodes[i];
++        const Node& original = before[i];
++        require((current.state.values.array() == original.state.values.array()).all() &&
++                    current.metadata == original.metadata && current.id == original.id,
++                "Every existing node keeps its exact state and metadata");
++        if (nodes[i] != a) {
++            require(current.parent == original.parent,
++                    "Other parent pointers remain unchanged");
++            require((current.incoming.coefficients.array() ==
++                     original.incoming.coefficients.array()).all() &&
++                        (current.incoming.start.values.array() ==
++                         original.incoming.start.values.array()).all() &&
++                        (current.incoming.end.values.array() ==
++                         original.incoming.end.values.array()).all() &&
++                        current.incoming.T == original.incoming.T &&
++                        current.incoming.cost == original.incoming.cost &&
++                        current.incoming.metadata == original.incoming.metadata,
++                    "All other stored trajectories remain exactly unchanged");
++        }
++        if (i >= 3) {
++            require(current.children == original.children,
++                    "Subtree topology remains unchanged");
++            close(current.cost, original.cost + delta, 1e-12,
++                  "Children and grandchildren inherit only the cost delta");
++        }
++    }
++    require(root->cost == before[0].cost && b->cost == before[2].cost,
++            "Costs outside the rewired subtree stay unchanged");
++    require(!Rewiring<Node>::commit(a, d, edge(d_state, a_state, 1.0)),
++            "Cycle rejected");
++    require(!tree.removeNode(b), "Cannot delete internal node");
++    require(tree.removeNode(d) && c->children.empty(),
++            "Leaf deletion updates parent");
++    require(tree.size() == 5, "Tree size");
+ }
++
++int main() {
++    return runTest([] {
++        checkFixedStateRewire<2, 2>();
++        checkFixedStateRewire<2, 4>();
++        checkFixedStateRewire<4, 4>();
++    });
++}
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -37,7 +37,7 @@
+ endif()
+ include(CTest)
+ if(BUILD_TESTING)
+-  foreach(test_name pff tree end_to_end df dynobench simd)
++  foreach(test_name pff tree rewire_metadata end_to_end df dynobench simd)
+     add_executable(test_${test_name} tests/test_${test_name}.cpp)
+     target_link_libraries(test_${test_name} PRIVATE rrtstar_df_pff)
+     add_test(NAME ${test_name} COMMAND test_${test_name})
+diff --git a/tests/test_rewire_metadata.cpp b/tests/test_rewire_metadata.cpp
+new file mode 100644
+--- /dev/null
++++ b/tests/test_rewire_metadata.cpp
+@@ -0,0 +1,150 @@
++#include "core/node.h"
++#include "core/tree.h"
++#include "core/rewiring.h"
++#include "pff/pff.h"
++#include "systems/unicycle_model.h"
++#include "tests/test_support.h"
++#include <array>
++#include <cmath>
++#include <cstddef>
++#include <limits>
++
++using namespace rrtpff;
++
++using Node = RRTNode<2, 2, UnicycleTrajectoryMetadata>;
++
++bool sameMetadata(const Node::Metadata& a, const Node::Metadata& b) {
++    return a.branch == b.branch &&
++        a.signed_start_velocity == b.signed_start_velocity;
++}
++
++void requireUnchanged(const Node& node, const Node& before) {
++    require((node.state.values.array() == before.state.values.array()).all() &&
++                sameMetadata(node.metadata, before.metadata) && node.id == before.id,
++            "Existing node state and metadata are frozen");
++    require(node.parent == before.parent && node.children == before.children &&
++                node.cost == before.cost,
++            "Rejected rewire leaves tree links and all costs untouched");
++    require((node.incoming.coefficients.array() == before.incoming.coefficients.array()).all() &&
++                (node.incoming.start.values.array() == before.incoming.start.values.array()).all() &&
++                (node.incoming.end.values.array() == before.incoming.end.values.array()).all() &&
++                node.incoming.T == before.incoming.T &&
++                node.incoming.cost == before.incoming.cost,
++            "Stored trajectory stays exactly unchanged");
++    if (node.parent) {
++        require(sameMetadata(node.incoming.metadata, before.incoming.metadata),
++                "Stored edge branch and start speed stay unchanged");
++    }
++}
++
++void checkBranchPreservation(VelocityBranch branch) {
++    UnicycleDF::Config config;
++    config.allow_reverse = true;
++    config.max_velocity = 2.0;
++    const double sign = branch == VelocityBranch::Reverse ? -1.0 : 1.0;
++
++    Node::State root_state, added_state, target_state, child_state, grandchild_state;
++    root_state.values << 0.0, 0.0, 0.2, 0.0;
++    added_state.values << 0.1, 0.0, 0.2, 0.0;
++    target_state.values << 0.325, 0.0, 0.25, 0.0;
++    child_state.values << 0.6, 0.0, 0.3, 0.0;
++    grandchild_state.values << 0.925, 0.0, 0.35, 0.0;
++    UnicycleModel model(root_state, grandchild_state.output(),
++                        Node::State::Output::Constant(-2.0),
++                        Node::State::Output::Constant(2.0), UniAdapter{},
++                        config, sign * 0.2);
++    PFFSolver<2, 2, Node::Metadata> solver;
++    RRTTree<Node> tree;
++    auto edge = [&](const Node::State& from, const Node::State& to, double time) {
++        auto result = solver.fixedTime(from, TerminalConstraint<2, 2>::full(to), time);
++        require(result.success, "Unicycle full-state PFF edge solved");
++        Node::Metadata metadata;
++        require(UnicycleDF::makeMetadata(sign * from.derivative(1).norm(),
++                                          metadata, config),
++                "Explicit start branch");
++        require(model.prepareEdge(from, metadata, result.trajectory),
++                "Attach start metadata");
++        require(model.dfFeasible(result.trajectory), "Fixture DF edge is feasible");
++        return result.trajectory;
++    };
++    auto* root = tree.createNode(root_state, nullptr, {}, model.initialMetadata());
++    auto add = [&](const Node::State& state, Node* parent, double time) {
++        auto trajectory = edge(parent->state, state, time);
++        auto* node = tree.createNode(state, parent, trajectory);
++        node->metadata = model.terminalMetadata(trajectory);
++        return node;
++    };
++    auto* added = add(added_state, root, 0.5);
++    auto* target = add(target_state, root, 0.5);
++    auto* child = add(child_state, target, 1.0);
++    auto* grandchild = add(grandchild_state, child, 1.0);
++    const auto replacement = edge(added_state, target_state, 1.0);
++    require(added->cost + replacement.cost < target->cost,
++            "Metadata fixture has a genuine cost improvement");
++    require(std::abs(replacement.metadata.signed_start_velocity -
++                     target->metadata.signed_start_velocity) > 0.01,
++            "Fixture distinguishes edge start speed from endpoint speed");
++    require(model.terminalMetadataMatches(replacement, target->metadata),
++            "Compatibility uses terminal speed, not the edge start speed");
++
++    // Accept numerical tolerance without overwriting the original metadata.
++    target->metadata.signed_start_velocity += sign * 5e-10;
++    const std::array<Node*, 5> nodes{root, added, target, child, grandchild};
++    const std::array<Node, 5> before{*root, *added, *target, *child, *grandchild};
++    auto requireUnchangedTree = [&] {
++        for (std::size_t i = 0; i < nodes.size(); ++i) {
++            requireUnchanged(*nodes[i], before[i]);
++        }
++    };
++
++    auto opposite_branch = replacement;
++    opposite_branch.metadata.branch = branch == VelocityBranch::Forward
++        ? VelocityBranch::Reverse : VelocityBranch::Forward;
++    opposite_branch.metadata.signed_start_velocity *= -1.0;
++    require(!Rewiring<Node>::commit(target, added, opposite_branch, model),
++            "Same flat endpoint with opposite physical branch is rejected");
++    requireUnchangedTree();
++
++    auto missing_metadata = replacement;
++    missing_metadata.metadata.signed_start_velocity =
++        std::numeric_limits<double>::quiet_NaN();
++    require(!Rewiring<Node>::commit(target, added, missing_metadata, model),
++            "Missing edge metadata is rejected before changing the tree");
++    requireUnchangedTree();
++
++    target->metadata.signed_start_velocity = sign * 0.3;
++    const Node invalid_target = *target;
++    require(!Rewiring<Node>::commit(target, added, replacement, model),
++            "Mismatched endpoint signed speed is rejected");
++    requireUnchanged(*target, invalid_target);
++    target->metadata = before[2].metadata;
++    requireUnchangedTree();
++
++    require(Rewiring<Node>::commit(target, added, replacement, model),
++            "Same branch and matching endpoint can rewire");
++    require(target->parent == added &&
++                sameMetadata(target->metadata, before[2].metadata) &&
++                (target->state.values.array() == before[2].state.values.array()).all(),
++            "Successful rewire preserves the exact target state and metadata");
++    require(target->children == before[2].children &&
++                sameMetadata(target->incoming.metadata, replacement.metadata),
++            "Target keeps children while storing the new edge's start metadata");
++    const double delta = target->cost - before[2].cost;
++    for (std::size_t i : {std::size_t{3}, std::size_t{4}}) {
++        close(nodes[i]->cost, before[i].cost + delta, 1e-12,
++              "Only cumulative cost changes in the subtree");
++        Node expected = before[i];
++        expected.cost = nodes[i]->cost;
++        requireUnchanged(*nodes[i], expected);
++    }
++    require(root->cost == before[0].cost && added->cost == before[1].cost &&
++                sameMetadata(added->metadata, before[1].metadata),
++            "New parent keeps its state semantics and cost");
++}
++
++int main() {
++    return runTest([] {
++        checkBranchPreservation(VelocityBranch::Forward);
++        checkBranchPreservation(VelocityBranch::Reverse);
++    });
++}
+diff --git a/docs/rewire_fixed_state.md b/docs/rewire_fixed_state.md
+new file mode 100644
+--- /dev/null
++++ b/docs/rewire_fixed_state.md
+@@ -0,0 +1,58 @@
++# Rewire 修改说明（2026-09-18）
++
++修改位置：`D:/codex_talk/project_1/project_code/RRTstarDFPFF_next`。
++
++本次约束：每次成功重连只重新求解并替换 `added -> node` 的入边，固定两端完整 FlatState。所有已有节点的 state 和 metadata 保持原值；子树内部的父子链接、轨迹系数、边代价及边持续时间保持原值，只传播累计 cost。
++
++## 逐项检查
++
++| 要求 | 本次处理 | 验证状态 |
++|---|---|---|
++| 只求解 `added -> node` | 保留 `Constraint::full(node->state)` | 源码核对完成 |
++| 固定两端速度 | 二阶系统固定位置、速度 | 已编写回归测试，待 C++ 运行 |
++| 四阶完整状态不变 | 位置、速度、加速度、jerk 全部固定 | 已编写逐阶端点拒绝测试，待运行 |
++| 不覆盖既有节点 state / metadata | 删除 `commit()` 和 `rewire()` 中的 metadata 赋值；无 state 赋值 | 源码核对完成 |
++| Unicycle branch 不匹配时拒绝 | 修改树之前调用模型的 `terminalMetadataMatches()` | 正向/倒车拒绝用例已编写，待运行 |
++| 比较终点有符号速度 | 根据新边 `end` 和固定 branch 恢复速度，与目标节点 metadata 在配置容差内比较 | 起点/终点速度不同的用例已编写，待运行 |
++| 匹配成功仍保留原 metadata | 容差比较仅判断可否连接，不用计算结果替换节点原值 | 精确保留原值的测试已编写，待运行 |
++| 子树只更新累计 cost | 保留 `child.cost = parent.cost + child.incoming.cost` 的遍历 | 子节点、孙节点和旁支快照测试已编写，待运行 |
++| 拒绝时整树不变 | 元数据检查位于所有树写操作之前 | 分支错误、缺失数据、终点速度错误的快照测试已编写，待运行 |
++| 通用 core 不包含 Unicycle 公式 | 自定义 metadata 的比较交给 System Model；`std::monostate` 没有额外约束 | 源码核对完成 |
++
++`added` 插入时的 metadata 初始化仍然必要。本次仅移除重连已有节点时的两处 metadata 覆盖。
++
++## 修改文件和接口
++
++- `core/rewiring.h`：新增 `commit(node, parent, edge, model)`；有实际内容的 metadata 必须通过模型验证。三参数版本仅供 `std::monostate` 使用，防止绕过状态语义检查。
++- `core/rrtstar.h`：重连时传入模型，删除重连成功后对目标 metadata 的赋值。
++- `systems/unicycle_model.h`：新增 `terminalMetadataMatches(edge, target_metadata)`，校验有效性、branch 和终点有符号速度。
++- `tests/test_tree.cpp`：覆盖 `<2,2>`、`<2,4>`、`<4,4>` 的完整状态固定、子树 cost 传播、其他入边保持原值及成环拒绝。修正旧测试使用过短连接时间、实际不能降低 cost 的测试输入。
++- `tests/test_rewire_metadata.cpp`：新增正向/倒车语义和拒绝后整树不变的测试。
++- `CMakeLists.txt`：注册 `rewire_metadata` 测试。
++
++## 验证结果和运行命令
++
++本机未发现可用的 `cl`、`g++`、`clang++`、`nmake` 或 `ninja`，因此本次 C++ 编译和 CTest **未执行**。没有再次调用此前受阻的 WSL。以下命令用于具备 C++17、Eigen3、yaml-cpp 和 CMake 的环境：
++
++```sh
++cmake -S . -B build_rewire -DBUILD_TESTING=ON
++cmake --build build_rewire --config Release --target test_tree test_rewire_metadata test_end_to_end
++ctest --test-dir build_rewire -C Release --output-on-failure -R "^(tree|rewire_metadata|end_to_end)$"
++```
++
++执行过独立 Python 数值核算，确认新测试输入的代价满足改进条件。这只校验测试输入，不代表执行了 C++ 测试：
++
++| 输入 | 重连前累计 cost | 重连后累计 cost |
++|---|---:|---:|
++| `<2,2>` | 375.0200 | 16.4222 |
++| `<2,4>` | 50330276.1000 | 96133.1132 |
++| `<4,4>` | 50346567.7000 | 96730.2613 |
++| Unicycle | 4.8400 | 1.5025 |
++
++## 备份和独立补丁
++
++修改前文件已保存在 `backups/rewire_before_20260918_202548/`，文件名带 `.before` 后缀，避免作为源码参与构建。
++
++`docs/rewire_fixed_state.patch` 仅包含本次修改，不包含工作区此前已有的其他差异。当前源码已经应用本次修改；补丁用于审阅或迁移到匹配的修改前版本。
++
++本次修正不代表真实 DynoBench 六环境、完整 SIMD 或整个项目已通过验收。

@@ -1,0 +1,40 @@
+system: linear
+environment: empty
+start: [1, 1, 0, 0]
+goal: [2, 2]
+bounds:
+  lower: [0, 0]
+  upper: [4, 4]
+limits:
+  max_velocity: 10
+  max_control: 8
+  obstacle_margin: 0
+obstacles: []
+planner:
+  timeout: 2
+  goal_bias: 1
+  range: 4
+  rewire_factor: 3
+  goal_tolerance: 0.000001
+  max_iterations: 10
+  max_nodes: 10
+  prune: false
+  stop_at_first_solution: true
+pff:
+  R_diagonal: [1, 1]
+  free_terminal_state: true
+  free_terminal_time: true
+  min_time: 0.001
+  max_time: 5
+  fixed_time: 1
+simd:
+  enabled: true
+  width: 8
+  pff: true
+  nearest_neighbor: true
+  collision_samples: 33
+  interleaved_samples: true
+benchmark:
+  runs: 1
+  seed: 40
+  output_directory: ../../results/linear_simd_smoke
